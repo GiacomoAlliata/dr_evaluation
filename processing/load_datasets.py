@@ -29,7 +29,7 @@ def load_rts(merge_metadata = False, scene_min_duration = 4):
     return rts_features
     
 def load_pdl_poses():
-    POSES_FOLDER = "F:/prix_lausanne/lp_poses_every5/"
+    POSES_FOLDER = "data/lp_poses_every5/"
     poses_pdl = []
     poses_fp = os.listdir(POSES_FOLDER)
     for pose_fp in poses_fp:
@@ -72,27 +72,30 @@ def load_mjf(merge_metadata = False):
         
     return mjf_features
 
-def load_features(datasets_to_load = ["rts", "pdl", "ioc", "mjf"], merge_metadata = False):
-    features = {}
+def load_datasets(datasets_to_load = ["rts", "pdl", "ioc", "mjf"], merge_metadata = False):
+    datasets = {}
     if "rts" in datasets_to_load:
         rts_features = load_rts(merge_metadata = merge_metadata)
-        features["rts"] = np.array(rts_features["imagenet_features"].tolist())
+        datasets["rts"] = np.array(rts_features["imagenet_features"].tolist())
         
     if "pdl" in datasets_to_load:
         pdl_features = load_pdl_poses()
-        features["pdl"] = np.array([list(pose["flat_embedding"]) for pose in pdl_features])
+        datasets["pdl"] = np.array([list(pose["flat_embedding"]) for pose in pdl_features])
         
     if "ioc" in datasets_to_load:
         ioc_features = load_ioc_poses()
-        features["ioc"] = np.array(ioc_features["embedding_33"].tolist())
+        datasets["ioc"] = np.array(ioc_features["embedding_33"].tolist())
         
     if "mjf" in datasets_to_load:
         mjf_features = load_mjf(merge_metadata = merge_metadata)
-        features["mjf"] = np.array(mjf_features["genres_f"].tolist())
+        datasets["mjf"] = np.array(mjf_features["genres_f"].tolist())
+        
+    if "mnist" in datasets_to_load:
+        datasets["mnist"] = np.load('DATA/mnist_pca.npy', allow_pickle=True).reshape(70000, -1)
     
     print("Features loaded:")
-    for name,data in features.items():
+    for name,data in datasets.items():
         print(f"{name}: {data.shape[0]} samples of dimension {data.shape[1]}")
     
-    return features
+    return datasets
     

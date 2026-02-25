@@ -80,7 +80,7 @@ def load_datasets(datasets_to_load = ["rts", "pdl", "ioc", "mjf"], merge_metadat
         datasets["ioc"] = np.array(ioc_features["embedding_33"].tolist())
         
     if "mjf" in datasets_to_load:
-        mjf_features = load_mjf(merge_metadata = merge_metadata)
+        mjf_features = load_mjf()
         datasets["mjf"] = np.array(mjf_features["genres_f"].tolist())
         
     if "mnist" in datasets_to_load:

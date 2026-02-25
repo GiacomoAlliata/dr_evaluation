@@ -1,5 +1,5 @@
 # Colors for visualisations
-SINGLE_COLOR = "#1f77b4"
+SINGLE_COLOR = "#0072B2"
 
 COLORS_4 = [
     "#0072B2",  # blue

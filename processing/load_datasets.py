@@ -9,6 +9,8 @@ from processing.pose_loader import load_poses
 from processing.pose_processing import normalise_pose
 
 def load_rts(merge_metadata = False, scene_min_duration = 4):
+    if not os.path.exists("data/rts_features.pkl") or (merge_metadata and not os.path.exists("data/rts_metadata.hdf5")):
+        raise FileNotFoundError("RTS features or metadata not available because of copyright restrictions. Please directly load provided 2D embeddings.")
     rts_features = pd.read_pickle("data/rts_features.pkl")
     rts_features.drop(columns=['face_features', 'landmark_features'], inplace=True)
     
@@ -29,6 +31,8 @@ def load_rts(merge_metadata = False, scene_min_duration = 4):
     return rts_features
     
 def load_pdl_poses():
+    if not os.path.exists("data/lp_poses_every5/"):
+        raise FileNotFoundError("PDL pose data not available because of copyright restrictions. Please directly load provided 2D embeddings.")
     POSES_FOLDER = "data/lp_poses_every5/"
     poses_pdl = []
     poses_fp = os.listdir(POSES_FOLDER)
@@ -42,33 +46,22 @@ def load_pdl_poses():
     return poses_pdl
     
 def load_ioc_poses():
+    if not os.path.exists("data/poses_ioc.csv"):
+        raise FileNotFoundError("IOC pose data not available because of copyright restrictions. Please directly load provided 2D embeddings.")
     poses_ioc = pd.read_csv("data/poses_ioc.csv", converters={"embedding_33": literal_eval})
     return poses_ioc
     
-def load_mjf(merge_metadata = False):
+def load_mjf():
+    if not os.path.exists("data/mjf_vectors_genre.csv"):
+        raise FileNotFoundError("MJF features not available because of copyright restrictions. Please directly load provided 2D embeddings.")
     genres = pd.read_csv("data/mjf_vectors_genre.csv")
     genres["media_id"] = genres.media_id.map(lambda x: int(x.split("-")[1]))
     genres.sort_values("media_id", inplace = True)
 
-    instruments = pd.read_csv("data/mjf_vectors_instrument.csv")
-    instruments["media_id"] = instruments.media_id.map(lambda x: int(x.split("-")[1]))
-    instruments.sort_values("media_id", inplace = True)
-
-    moods = pd.read_csv("data/mjf_vectors_mood.csv")
-    moods["media_id"] = moods.media_id.map(lambda x: int(x.split("-")[1]))
-    moods.sort_values("media_id", inplace = True)
-    
     mjf_features = genres.copy()
     mjf_features["genres_f"] = genres.drop("media_id", axis = 1).agg(list, axis = 1).tolist()
-    mjf_features["insts_f"] = instruments.drop("media_id", axis = 1).agg(list, axis = 1).tolist()
-    mjf_features["moods_f"] = moods.drop("media_id", axis = 1).agg(list, axis = 1).tolist()
 
-    mjf_features = mjf_features[["media_id", "genres_f", "insts_f", "moods_f"]]
-    
-    if merge_metadata:
-        with open("data/mjf_metadata.json", "r") as f:
-            mjf_metadata = json.load(f)
-        # TODO: merge metadata
+    mjf_features = mjf_features[["media_id", "genres_f"]]
         
     return mjf_features
 

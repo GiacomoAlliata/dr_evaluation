@@ -1,0 +1,20 @@
+name: dr_eval
+channels:
+  - conda-forge
+  - anaconda
+  - ecoevoinfo
+dependencies:
+  - python=3.10
+  - pip
+  - numpy
+  - scipy
+  - umap-learn
+  - scikit-learn
+  - pacmap
+  - ipykernel
+  - matplotlib
+  - pandas
+  - cython
+  - mantel
+  - numba
+  - pytables

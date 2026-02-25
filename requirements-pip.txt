@@ -1,0 +1,7 @@
+aiohttp==3.13.3
+ffmpeg-python==0.2.0
+pyDRMetrics==0.0.7
+PySocks==1.7.1
+scenedetect==0.6.7.1
+trimap==1.1.5
+typer==0.23.1

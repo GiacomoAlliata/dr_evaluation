@@ -5,16 +5,10 @@ import pandas as pd
 
 os.environ["OMP_NUM_THREADS"] = '4'
 
-from pyDRMetrics.pyDRMetrics import *
 from sklearn.decomposition import PCA
-from sklearn.cluster import KMeans
 from sklearn.neighbors import NearestNeighbors
-from sklearn.metrics import pairwise_distances
 import scipy
 from scipy.spatial.distance import pdist, squareform
-from coranking import coranking_matrix
-from coranking.metrics import trustworthiness, continuity, LCMC
-import mantel
 
 def neighbor_kept_ratio_eval(X, X_new, n_neighbors=30):
     '''
@@ -71,29 +65,6 @@ def global_score(X_high, X_low):
     gs_pca = global_loss_(X_high, Y_pca)
     gs_emb = global_loss_(X_high, X_low)
     return np.exp(-(gs_emb - gs_pca) / gs_pca)
-
-def compute_coranking_metrics(X_high, X_low, ks):
-    """
-    Compute trustworthiness, continuity and LCMC metrics for a range of k values.
-
-    Args:
-        X_high: original data in the high-dimensional space
-        X_low: data in the low-dimensional space
-        ks: list of k values to compute the metrics on (i.e. how many neighbors to consider for the metrics)
-
-    Returns:
-        tuple of lists: trustworthiness, continuity and LCMC values for each k value
-    """
-    Q = coranking_matrix(X_high, X_low)
-    t_values = []
-    c_values = []
-    lcmc_values = []
-    for k in ks:
-        t_values.append(trustworthiness(Q, min_k=k, max_k=k + 1)[0])
-        c_values.append(continuity(Q, min_k=k, max_k=k + 1)[0])
-        lcmc_values.append(LCMC(Q, min_k=k, max_k=k + 1)[0])
-
-    return t_values, c_values, lcmc_values
 
 
 def compute_triplet_accuracy(X_high, X_low, triplets):
@@ -200,15 +171,12 @@ def run_eval(X_high, X_low,
              neighbors_high,
              n_sample = 100,
              neighborhood_size = 50,
-             n_repetitions = 100,
-             run_drmetrics = False):
+             n_repetitions = 100):
     
     nkt = neighbor_kept_ratio_eval(X_high, X_low)
     gs = global_score(X_high, X_low)
     rta = random_triplet_accuracy(X_high, X_low, neighbors_high, n_triplets=n_sample, n_repetitions=n_repetitions, neighborhood_size=neighborhood_size)
     dist_corr = spearman_correlation_eval(X_high, X_low, n_points=n_sample, n_repetitions=n_repetitions)
-    # Compute coranking metrics up to twice the neighborhood size
-    #t_values, c_values, lcmc_values = compute_coranking_metrics(X_high, X_low, range(1, 2*neighborhood_size))
     
     results = {
         "neighbor_kept_ratio": nkt,
@@ -216,13 +184,5 @@ def run_eval(X_high, X_low,
         "rta": rta,
         "dist_corr": dist_corr
     }
-    
-    if run_drmetrics:
-        dr_metrics = DRMetrics(X_high, X_low)
-        results.update({
-            "AUC_T":dr_metrics[name].AUC_T,
-            "AUC_C":dr_metrics[name].AUC_C,
-            "Q_local":dr_metrics[name].Qlocal
-        })
         
     return results

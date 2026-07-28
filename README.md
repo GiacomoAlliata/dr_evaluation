@@ -23,6 +23,7 @@ pip install -r requirements-pip.txt
 * dr_params_study: analyse the effect of the hyper-parameters of the four DR algorithms on each dataset
 * dr_computational: evaluate the computational efficiency and the stability of the four DR algorithms
 * dr_classes: specific case study on a subsample of sports videos to visually evaluate global structure preservation
+* dr_pca: quick notebook to compute the cumulative variance of the first PCs obtained with PCA
 
 ## License
 
